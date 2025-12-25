@@ -2,6 +2,8 @@
 
 import typer
 
+from typ_tmpl.core.container import AppContext
+
 greet_app = typer.Typer(help="Greeting commands.")
 
 
@@ -16,6 +18,6 @@ def hello(
     Example:
         typ-tmpl greet hello World
     """
-    app_ctx = ctx.obj
+    app_ctx: AppContext = ctx.obj
     message = app_ctx.greeting_service.generate_greeting(name)
     typer.echo(message)

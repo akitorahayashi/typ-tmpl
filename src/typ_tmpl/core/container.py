@@ -14,12 +14,41 @@ class AppContext:
     greeting_service: GreetingServiceProtocol
 
 
-def create_container(settings: AppSettings | None = None) -> AppContext:
+def get_greeting_service(settings: AppSettings) -> GreetingServiceProtocol:
+    """
+    Get the appropriate greeting service based on settings.
+
+    This function handles the conditional import of mock services to avoid
+    importing development code in production scenarios.
+
+    Args:
+        settings: Application settings containing the mock toggle.
+
+    Returns:
+        Either a mock or real greeting service implementation.
+    """
+    if settings.use_mock_greeting:
+        # Import mock only when needed to avoid dev code in production builds
+        from dev.mocks.services.mock_greeting_service import MockGreetingService
+
+        return MockGreetingService()
+    else:
+        from typ_tmpl.services.greeting_service import GreetingService
+
+        return GreetingService()
+
+
+def create_container(
+    settings: AppSettings | None = None,
+    greeting_service: GreetingServiceProtocol | None = None,
+) -> AppContext:
     """
     Create and return the application context with all dependencies wired.
 
     Args:
         settings: Optional pre-configured settings. If None, loads from environment.
+        greeting_service: Optional service override for testing. If None, uses
+                         the appropriate service based on settings.
 
     Returns:
         AppContext with settings and services initialized.
@@ -27,13 +56,7 @@ def create_container(settings: AppSettings | None = None) -> AppContext:
     if settings is None:
         settings = AppSettings()
 
-    if settings.use_mock_greeting:
-        from dev.mocks.services.mock_greeting_service import MockGreetingService
+    if greeting_service is None:
+        greeting_service = get_greeting_service(settings)
 
-        service: GreetingServiceProtocol = MockGreetingService()
-    else:
-        from typ_tmpl.services.greeting_service import GreetingService
-
-        service = GreetingService()
-
-    return AppContext(settings=settings, greeting_service=service)
+    return AppContext(settings=settings, greeting_service=greeting_service)

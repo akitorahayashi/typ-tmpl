@@ -29,7 +29,7 @@ def get_safe_version(package_name: str, fallback: str = "0.1.0") -> str:
         return fallback
 
 
-def version_callback(value: bool) -> None:
+def version_callback(value: bool | None) -> None:
     """Print version and exit."""
     if value:
         version = get_safe_version("typ-tmpl")
