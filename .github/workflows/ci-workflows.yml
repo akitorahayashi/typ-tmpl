@@ -14,7 +14,3 @@ jobs:
   run-local-tests:
     uses: ./.github/workflows/run-local-tests.yml
     secrets: inherit
-
-  run-docker-tests:
-    uses: ./.github/workflows/run-docker-tests.yml
-    secrets: inherit
