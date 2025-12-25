@@ -2,22 +2,37 @@
 
 `typ-tmpl` is a minimal, database-independent Python CLI template using Typer. It provides a clean scaffold with dependency injection via context objects, protocols for service interfaces, and a factory pattern for services. This enables high extensibility, maintainability, and testability. Includes environment-aware configuration and a lightweight test suite so you can start new CLI tools quickly without dragging in domain-specific code.
 
-## 🚀 Getting Started
+## 🚀 Installation
 
-### Prerequisites
+### Install with pipx (Recommended)
 
-- Python 3.12+
-- [uv](https://github.com/astral-sh/uv) for dependency management
-
-### Local Setup
+Install directly from GitHub using [pipx](https://pipx.pypa.io/):
 
 ```shell
+pipx install git+https://github.com/akitorahayashi/typ-tmpl.git
+```
+
+After installation, the `typ-tmpl` command is available globally:
+
+```shell
+typ-tmpl --version
+typ-tmpl --help
+typ-tmpl greet hello World
+```
+
+### Development Setup
+
+For development, clone the repository and use [uv](https://github.com/astral-sh/uv):
+
+```shell
+git clone https://github.com/akitorahayashi/typ-tmpl.git
+cd typ-tmpl
 just setup
 ```
 
 This installs dependencies with `uv` and creates a local `.env` file if one does not exist.
 
-### Run the Application
+### Run during Development
 
 ```shell
 just run --help
@@ -87,3 +102,4 @@ typ-tmpl greet hello <name>  # Greet someone by name
 ```
 
 Use this as a foundation for adding your own commands, services, and business logic.
+
