@@ -1,50 +1,59 @@
-"""Integration tests for component interactions."""
+"""Integration tests for CLI command interactions."""
 
-import pytest
-from httpx import AsyncClient
+from typer.testing import CliRunner
 
-from fapi_tmpl.api.dependencies import get_app_settings
-
-
-@pytest.fixture(autouse=True)
-def clear_settings_cache():
-    """Clear the settings cache before and after each test."""
-    get_app_settings.cache_clear()
-    yield
-    get_app_settings.cache_clear()
+from typ_tmpl.main import app
 
 
-class TestIntegration:
-    """Integration tests for component interactions."""
+class TestCLIIntegration:
+    """Integration tests for CLI command interactions."""
 
-    @pytest.mark.asyncio
-    async def test_greeting_service_integration_with_real_service(
-        self, monkeypatch, async_client: AsyncClient
-    ):
-        """Test that the greeting service integrates correctly with the real implementation."""
-        monkeypatch.delenv("FAPI_TMPL_USE_MOCK_GREETING", raising=False)
+    def test_version_flag_shows_version(self, cli_runner: CliRunner):
+        """Test that --version flag shows version information."""
+        result = cli_runner.invoke(app, ["--version"])
 
-        response = await async_client.get("/hello/Alice")
+        assert result.exit_code == 0
+        assert "typ-tmpl version:" in result.output
 
-        assert response.status_code == 200
-        assert response.json() == {"message": "Hello, Alice"}
+    def test_help_flag_shows_help(self, cli_runner: CliRunner):
+        """Test that --help flag shows help information."""
+        result = cli_runner.invoke(app, ["--help"])
 
-    @pytest.mark.asyncio
-    async def test_greeting_service_integration_with_mock_service(
-        self, monkeypatch, async_client: AsyncClient
-    ):
-        """Test that the greeting service integrates correctly with the mock implementation."""
-        monkeypatch.setenv("FAPI_TMPL_USE_MOCK_GREETING", "true")
+        assert result.exit_code == 0
+        assert "typ-tmpl" in result.output
 
-        response = await async_client.get("/hello/World")
+    def test_greet_hello_with_real_service(self, cli_runner: CliRunner):
+        """Test that the greet command works with the real service."""
+        # Use env parameter to override environment variable for this invocation
+        result = cli_runner.invoke(
+            app,
+            ["greet", "hello", "Alice"],
+            env={"TYP_TMPL_USE_MOCK_GREETING": "false"},
+        )
 
-        assert response.status_code == 200
-        assert response.json() == {"message": "[mock] Hello, World"}
+        assert result.exit_code == 0
+        assert "Hello, Alice" in result.output
 
-    @pytest.mark.asyncio
-    async def test_health_check_integration(self, async_client: AsyncClient):
-        """Test that the health check endpoint integrates properly with the application."""
-        response = await async_client.get("/health")
+    def test_greet_hello_with_mock_service(self, cli_runner: CliRunner):
+        """Test that the greet command works with the mock service."""
+        result = cli_runner.invoke(
+            app,
+            ["greet", "hello", "World"],
+            env={"TYP_TMPL_USE_MOCK_GREETING": "true"},
+        )
 
-        assert response.status_code == 200
-        assert response.json() == {"status": "ok"}
+        assert result.exit_code == 0
+        assert "[mock] Hello, World" in result.output
+
+    def test_greet_hello_missing_name_shows_error(self, cli_runner: CliRunner):
+        """Test that missing name argument shows an error."""
+        result = cli_runner.invoke(app, ["greet", "hello"])
+
+        assert result.exit_code != 0
+
+    def test_no_args_shows_help(self, cli_runner: CliRunner):
+        """Test that running without arguments shows help (exit code 0 or 2)."""
+        result = cli_runner.invoke(app, [])
+
+        # no_args_is_help=True causes exit code 0, but if help is shown as error it's 2
+        assert "Usage:" in result.output or "typ-tmpl" in result.output

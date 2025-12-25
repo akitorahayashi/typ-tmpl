@@ -1,17 +1,9 @@
 """Unit tests for the greeting services."""
 
-import pytest
-
 from dev.mocks.services.mock_greeting_service import MockGreetingService
-from fapi_tmpl.api.dependencies import get_app_settings, get_greeting_service
-from fapi_tmpl.services.greeting_service import GreetingService
-
-
-@pytest.fixture(autouse=True)
-def reset_settings_cache():
-    get_app_settings.cache_clear()
-    yield
-    get_app_settings.cache_clear()
+from typ_tmpl.config.settings import AppSettings
+from typ_tmpl.core.container import create_container
+from typ_tmpl.services.greeting_service import GreetingService
 
 
 class TestGreetingService:
@@ -27,16 +19,22 @@ class TestGreetingService:
         result = service.generate_greeting("Developers")
         assert result == "[mock] Hello, Developers"
 
-    def test_get_greeting_service_defaults_to_real(self, monkeypatch):
-        monkeypatch.delenv("FAPI_TMPL_USE_MOCK_GREETING", raising=False)
 
-        service = get_greeting_service()
+class TestContainer:
+    """Unit tests for the DI container."""
 
-        assert isinstance(service, GreetingService)
+    def test_create_container_defaults_to_real_service(self, monkeypatch):
+        monkeypatch.delenv("TYP_TMPL_USE_MOCK_GREETING", raising=False)
 
-    def test_get_greeting_service_uses_mock_when_enabled(self, monkeypatch):
-        monkeypatch.setenv("FAPI_TMPL_USE_MOCK_GREETING", "true")
+        settings = AppSettings()
+        container = create_container(settings)
 
-        service = get_greeting_service()
+        assert isinstance(container.greeting_service, GreetingService)
 
-        assert isinstance(service, MockGreetingService)
+    def test_create_container_uses_mock_when_enabled(self, monkeypatch):
+        monkeypatch.setenv("TYP_TMPL_USE_MOCK_GREETING", "true")
+
+        settings = AppSettings()
+        container = create_container(settings)
+
+        assert isinstance(container.greeting_service, MockGreetingService)

@@ -1,6 +1,6 @@
 """Mock greeting service for development-time toggles."""
 
-from fapi_tmpl.protocols.greeting_service_protocol import GreetingServiceProtocol
+from typ_tmpl.protocols.greeting_service_protocol import GreetingServiceProtocol
 
 
 class MockGreetingService(GreetingServiceProtocol):

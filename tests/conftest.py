@@ -1,16 +1,14 @@
-"""Shared pytest fixtures for the fapi-tmpl project template."""
+"""Shared pytest fixtures for the typ-tmpl project template."""
 
 import pytest
-from fastapi import FastAPI
-from httpx import ASGITransport, AsyncClient
+from typer.testing import CliRunner
 
-from fapi_tmpl.api.main import app as fastapi_app
+from typ_tmpl.main import app
 
 
 @pytest.fixture(scope="session", autouse=True)
 def setup_test_environment():
     """Setup test environment with dotenv loading."""
-    # Load environment variables if .env exists
     try:
         import dotenv
 
@@ -20,14 +18,12 @@ def setup_test_environment():
 
 
 @pytest.fixture()
-def app() -> FastAPI:
-    """Return the FastAPI application under test."""
-    return fastapi_app
+def cli_runner() -> CliRunner:
+    """Provide a CLI runner for testing Typer commands."""
+    return CliRunner()
 
 
 @pytest.fixture()
-async def async_client(app: FastAPI) -> AsyncClient:
-    """Provide an async HTTP client for exercising the API."""
-    transport = ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://testserver") as client:
-        yield client
+def typer_app():
+    """Return the Typer application under test."""
+    return app

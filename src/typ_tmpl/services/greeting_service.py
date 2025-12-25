@@ -1,6 +1,6 @@
 """Concrete greeting service used by default."""
 
-from fapi_tmpl.protocols.greeting_service_protocol import GreetingServiceProtocol
+from typ_tmpl.protocols.greeting_service_protocol import GreetingServiceProtocol
 
 
 class GreetingService(GreetingServiceProtocol):
