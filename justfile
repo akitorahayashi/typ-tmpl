@@ -38,7 +38,7 @@ setup:
 
 # Run the CLI application
 run *args:
-    @uv run python -m typ_tmpl {{args}}
+    @uv run typ-tmpl {{args}}
 
 # ==============================================================================
 # CODE QUALITY
