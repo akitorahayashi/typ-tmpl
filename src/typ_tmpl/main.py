@@ -45,6 +45,7 @@ app = typer.Typer(
 
 # Register sub-command groups
 app.add_typer(greet_app, name="greet")
+app.add_typer(greet_app, name="g")
 
 
 @app.callback()

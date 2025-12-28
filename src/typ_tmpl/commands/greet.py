@@ -8,6 +8,7 @@ greet_app = typer.Typer(help="Greeting commands.")
 
 
 @greet_app.command("hello")
+@greet_app.command("hi")
 def hello(
     ctx: typer.Context,
     name: str = typer.Argument(..., help="Name of the person to greet."),
