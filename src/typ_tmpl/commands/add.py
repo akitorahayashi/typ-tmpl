@@ -4,6 +4,7 @@ import typer
 from rich.console import Console
 
 from typ_tmpl.context import AppContext
+from typ_tmpl.errors import ItemExistsError
 
 console = Console()
 
@@ -21,9 +22,9 @@ def add(
     """
     app_ctx: AppContext = ctx.obj
 
-    if app_ctx.storage.exists(id):
+    try:
+        app_ctx.storage.add(id, content)
+        console.print(f"[green]Added '{id}'[/]")
+    except ItemExistsError:
         console.print(f"[red]Error: Item '{id}' already exists[/]")
         raise typer.Exit(1)
-
-    app_ctx.storage.add(id, content)
-    console.print(f"[green]Added '{id}'[/]")

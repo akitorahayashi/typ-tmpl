@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pytest
 
+from typ_tmpl.errors import ItemExistsError, ItemNotFoundError
 from typ_tmpl.storage.filesystem import FilesystemStorage
 
 
@@ -21,6 +22,15 @@ class TestFilesystemStorage:
 
         assert (storage.base_dir / "test-item.txt").exists()
         assert (storage.base_dir / "test-item.txt").read_text() == "Test content"
+
+    def test_add_duplicate_raises_error(self, storage: FilesystemStorage) -> None:
+        """Test that adding duplicate item raises ItemExistsError."""
+        storage.add("item", "Content")
+
+        with pytest.raises(ItemExistsError) as exc_info:
+            storage.add("item", "New content")
+
+        assert exc_info.value.id == "item"
 
     def test_list_returns_item_ids(self, storage: FilesystemStorage) -> None:
         """Test that list returns item IDs."""
@@ -46,9 +56,12 @@ class TestFilesystemStorage:
 
         assert not storage.exists("to-delete")
 
-    def test_delete_nonexistent_is_noop(self, storage: FilesystemStorage) -> None:
-        """Test that deleting nonexistent item doesn't raise."""
-        storage.delete("nonexistent")  # Should not raise
+    def test_delete_nonexistent_raises_error(self, storage: FilesystemStorage) -> None:
+        """Test that deleting nonexistent item raises ItemNotFoundError."""
+        with pytest.raises(ItemNotFoundError) as exc_info:
+            storage.delete("nonexistent")
+
+        assert exc_info.value.id == "nonexistent"
 
     def test_exists_true(self, storage: FilesystemStorage) -> None:
         """Test that exists returns True for existing item."""

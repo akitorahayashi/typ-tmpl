@@ -21,14 +21,6 @@ def typer_app():
 @pytest.fixture()
 def mock_storage():
     """Provide a mock storage for testing."""
-    # Import here to avoid issues with dev/ path
-    import sys
-    from pathlib import Path
-
-    dev_path = Path(__file__).parent.parent / "dev"
-    if str(dev_path) not in sys.path:
-        sys.path.insert(0, str(dev_path.parent))
-
     from dev.mocks.storage import MockStorage
 
     return MockStorage()
@@ -53,13 +45,14 @@ def app_with_mock(mock_storage):
         ctx.obj = AppContext(storage=mock_storage)
 
     # Register commands from main app
-    from typ_tmpl.commands import add, delete, list_items
+    from typ_tmpl.main import app
 
-    test_app.command(name="add")(add)
-    test_app.command(name="a", hidden=True)(add)
-    test_app.command(name="list")(list_items)
-    test_app.command(name="ls", hidden=True)(list_items)
-    test_app.command(name="delete")(delete)
-    test_app.command(name="rm", hidden=True)(delete)
+    for command_info in app.registered_commands:
+        if command_info.callback:
+            test_app.command(
+                name=command_info.name,
+                help=command_info.help,
+                hidden=command_info.hidden,
+            )(command_info.callback)
 
     return test_app

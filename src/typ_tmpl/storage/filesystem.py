@@ -2,6 +2,8 @@
 
 from pathlib import Path
 
+from typ_tmpl.errors import ItemExistsError, ItemNotFoundError
+
 
 class FilesystemStorage:
     """Storage implementation using filesystem."""
@@ -28,8 +30,13 @@ class FilesystemStorage:
         Args:
             id: Unique identifier for the item.
             content: Content of the item.
+
+        Raises:
+            ItemExistsError: If an item with the same ID already exists.
         """
         path = self._item_path(id)
+        if path.exists():
+            raise ItemExistsError(id)
         path.write_text(content)
 
     def list(self) -> list[str]:
@@ -46,10 +53,14 @@ class FilesystemStorage:
 
         Args:
             id: Identifier of the item to delete.
+
+        Raises:
+            ItemNotFoundError: If the item does not exist.
         """
         path = self._item_path(id)
-        if path.exists():
-            path.unlink()
+        if not path.exists():
+            raise ItemNotFoundError(id)
+        path.unlink()
 
     def exists(self, id: str) -> bool:
         """Check if an item exists.

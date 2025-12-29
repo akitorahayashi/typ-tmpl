@@ -41,3 +41,14 @@ class Storage(Protocol):
             True if item exists, False otherwise.
         """
         ...
+
+    def get(self, id: str) -> str | None:
+        """Get the content of an item.
+
+        Args:
+            id: Identifier of the item.
+
+        Returns:
+            Content of the item, or None if not found.
+        """
+        ...

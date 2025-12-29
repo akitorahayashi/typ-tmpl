@@ -3,6 +3,8 @@
 from dataclasses import dataclass, field
 from typing import Any
 
+from typ_tmpl.errors import ItemExistsError, ItemNotFoundError
+
 
 @dataclass
 class MockStorage:
@@ -14,6 +16,8 @@ class MockStorage:
     def add(self, id: str, content: str) -> None:
         """Add a new item."""
         self.calls.append(("add", (id, content)))
+        if id in self.items:
+            raise ItemExistsError(id)
         self.items[id] = content
 
     def list(self) -> list[str]:
@@ -24,7 +28,9 @@ class MockStorage:
     def delete(self, id: str) -> None:
         """Delete an item."""
         self.calls.append(("delete", (id,)))
-        self.items.pop(id, None)
+        if id not in self.items:
+            raise ItemNotFoundError(id)
+        del self.items[id]
 
     def exists(self, id: str) -> bool:
         """Check if an item exists."""
