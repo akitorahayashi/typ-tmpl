@@ -6,7 +6,9 @@ from typing import Optional
 import typer
 from rich.console import Console
 
-from typ_tmpl.commands.greet import greet
+from typ_tmpl.commands import add, delete, list_items
+from typ_tmpl.context import AppContext
+from typ_tmpl.storage.filesystem import FilesystemStorage
 
 console = Console()
 
@@ -44,6 +46,7 @@ app = typer.Typer(
 
 @app.callback()
 def main(
+    ctx: typer.Context,
     version: Optional[bool] = typer.Option(
         None,
         "--version",
@@ -54,11 +57,21 @@ def main(
     ),
 ) -> None:
     """typ-tmpl - A minimal Python CLI template."""
+    if ctx.obj is None:
+        ctx.obj = AppContext(storage=FilesystemStorage())
 
 
-# Register greet command and alias
-app.command(name="greet", help=r"Greet someone by name. \[aliases: g]")(greet)
-app.command(name="g", hidden=True)(greet)
+# Register add command and alias
+app.command(name="add", help=r"Add a new item. \[aliases: a]")(add)
+app.command(name="a", hidden=True)(add)
+
+# Register list command and alias
+app.command(name="list", help=r"List all items. \[aliases: ls]")(list_items)
+app.command(name="ls", hidden=True)(list_items)
+
+# Register delete command and alias
+app.command(name="delete", help=r"Delete an item. \[aliases: rm]")(delete)
+app.command(name="rm", hidden=True)(delete)
 
 
 if __name__ == "__main__":
