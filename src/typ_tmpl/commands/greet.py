@@ -1,24 +1,18 @@
-"""Greeting command implementation."""
+"""Greet command implementation."""
 
 import typer
+from rich.console import Console
 
-from typ_tmpl.core.container import AppContext
-
-greet_app = typer.Typer(help="Greeting commands.")
+console = Console()
 
 
-@greet_app.command("hello")
-@greet_app.command("hi")
-def hello(
-    ctx: typer.Context,
+def greet(
     name: str = typer.Argument(..., help="Name of the person to greet."),
 ) -> None:
-    """
-    Greet someone by name.
+    """Greet someone by name.
 
-    Example:
-        typ-tmpl greet hello World
+    Examples:
+        typ-tmpl greet World
+        typ-tmpl g World
     """
-    app_ctx: AppContext = ctx.obj
-    message = app_ctx.greeting_service.generate_greeting(name)
-    typer.echo(message)
+    console.print(f"Hello, {name}!")

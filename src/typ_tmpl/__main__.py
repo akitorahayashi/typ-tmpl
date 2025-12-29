@@ -1,4 +1,4 @@
-"""Allow running typ-tmpl as a module: python -m typ_tmpl"""
+"""Allow running typ-tmpl as a module."""
 
 from typ_tmpl.main import app
 

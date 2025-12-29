@@ -1,20 +1,9 @@
-"""Shared pytest fixtures for the typ-tmpl project template."""
+"""Shared pytest fixtures for typ-tmpl."""
 
 import pytest
 from typer.testing import CliRunner
 
 from typ_tmpl.main import app
-
-
-@pytest.fixture(scope="session", autouse=True)
-def setup_test_environment():
-    """Setup test environment with dotenv loading."""
-    try:
-        import dotenv
-
-        dotenv.load_dotenv()
-    except ImportError:
-        pass
 
 
 @pytest.fixture()

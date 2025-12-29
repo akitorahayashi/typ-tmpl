@@ -1,13 +1,11 @@
 [project]
 name = "typ-tmpl"
 version = "0.1.0"
-description = "A minimal, database-independent Python CLI template using Typer."
-requires-python = ">=3.9"
+description = "Minimal Python CLI template using Typer."
+requires-python = ">=3.12"
 dependencies = [
-    "pydantic-settings>=2.0.0",
-    "python-dotenv==1.0.1",
-    "rich>=13.0.0",
-    "typer>=0.12.0",
+    "rich>=14.0.0,<15.0.0",
+    "typer>0.20.0,<1.0.0",
 ]
 
 [project.scripts]
