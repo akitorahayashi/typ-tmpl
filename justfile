@@ -1,4 +1,6 @@
-# justfile for typ-tmpl
+# ==============================================================================
+# justfile for typ-tmpl automation
+# ==============================================================================
 
 # default target
 default: help
@@ -7,36 +9,69 @@ default: help
 help:
     @echo "Usage: just [recipe]"
     @echo "Available recipes:"
-    @just --list | tail -n +2 | awk '{printf "  \033[36m%-15s\033[0m %s\n", $1, substr($0, index($0, $2))}'
+    @just --list | tail -n +2 | awk '{printf "  \033[36m%-20s\033[0m %s\n", $1, substr($0, index($0, $2))}'
 
-# Install dependencies
+# ==============================================================================
+# Environment Setup
+# ==============================================================================
+
+# Initialize project: install dependencies and create the .env file
 setup:
-    @echo "Installing dependencies..."
+    @echo "🐍 Installing python dependencies with uv..."
     @uv sync
-    @echo "Done"
+
+# ==============================================================================
+# Development Commands
+# ==============================================================================
 
 # Run the CLI application
 run *args:
     @uv run typ-tmpl {{args}}
 
-# Automatically format and fix code
+# ==============================================================================
+# CODE QUALITY
+# ==============================================================================
+
+# Automatically format and fix code (Ruff)
 fix:
-    @echo "Formatting code..."
+    @echo "🔧 Formatting and fixing code..."
     @uv run ruff format .
     @uv run ruff check . --fix
 
-# Run static checks
-check:
-    @echo "Running checks..."
+# Run static checks (Ruff, Mypy)
+check: fix
+    @echo "🔍 Running static checks..."
     @uv run ruff format --check .
     @uv run ruff check .
     @uv run mypy .
 
-# Run tests
+# ==============================================================================
+# TESTING
+# ==============================================================================
+
+# Run complete test suite
 test:
-    @echo "Running tests..."
-    @uv run pytest tests/
-    @echo "Done"
+    @just unit-test
+    @just intg-test
+    @echo "✅ All tests passed!"
+
+# Alias for test (backward compatibility)
+local-test:
+    @just test
+
+# Run unit tests
+unit-test:
+    @echo "🚀 Running unit tests..."
+    @uv run pytest tests/unit
+
+# Run integration tests
+intg-test:
+    @echo "🚀 Running integration tests..."
+    @uv run pytest tests/intg
+
+# ==============================================================================
+# CLEANUP
+# ==============================================================================
 
 # Remove cache files
 clean:
