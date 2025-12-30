@@ -61,4 +61,3 @@ python_version = "3.12"
 strict = true
 ignore_missing_imports = true
 disallow_untyped_defs = true
-exclude = ["tests/"]

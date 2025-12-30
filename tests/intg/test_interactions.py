@@ -1,7 +1,9 @@
 """Integration tests for CLI commands."""
 
+from typer import Typer
 from typer.testing import CliRunner
 
+from dev.mocks.storage import MockStorage
 from typ_tmpl.main import app
 
 
@@ -42,7 +44,9 @@ class TestCLIIntegration:
 class TestAddCommand:
     """Tests for the add command."""
 
-    def test_add_item(self, cli_runner: CliRunner, app_with_mock, mock_storage) -> None:
+    def test_add_item(
+        self, cli_runner: CliRunner, app_with_mock: Typer, mock_storage: MockStorage
+    ) -> None:
         """Test adding an item."""
         result = cli_runner.invoke(
             app_with_mock, ["add", "note1", "-c", "Test content"]
@@ -53,7 +57,7 @@ class TestAddCommand:
         assert mock_storage.items["note1"] == "Test content"
 
     def test_add_alias(
-        self, cli_runner: CliRunner, app_with_mock, mock_storage
+        self, cli_runner: CliRunner, app_with_mock: Typer, mock_storage: MockStorage
     ) -> None:
         """Test that 'a' alias works."""
         result = cli_runner.invoke(
@@ -64,7 +68,7 @@ class TestAddCommand:
         assert "Added" in result.output and "note2" in result.output
 
     def test_add_duplicate_fails(
-        self, cli_runner: CliRunner, app_with_mock, mock_storage
+        self, cli_runner: CliRunner, app_with_mock: Typer, mock_storage: MockStorage
     ) -> None:
         """Test that adding duplicate item fails."""
         mock_storage.items["existing"] = "Old content"
@@ -80,7 +84,7 @@ class TestAddCommand:
 class TestListCommand:
     """Tests for the list command."""
 
-    def test_list_empty(self, cli_runner: CliRunner, app_with_mock) -> None:
+    def test_list_empty(self, cli_runner: CliRunner, app_with_mock: Typer) -> None:
         """Test listing when no items exist."""
         result = cli_runner.invoke(app_with_mock, ["list"])
 
@@ -88,7 +92,7 @@ class TestListCommand:
         assert "No items found" in result.output
 
     def test_list_items(
-        self, cli_runner: CliRunner, app_with_mock, mock_storage
+        self, cli_runner: CliRunner, app_with_mock: Typer, mock_storage: MockStorage
     ) -> None:
         """Test listing items."""
         mock_storage.items["note1"] = "Content 1"
@@ -101,7 +105,7 @@ class TestListCommand:
         assert "note2" in result.output
 
     def test_list_alias(
-        self, cli_runner: CliRunner, app_with_mock, mock_storage
+        self, cli_runner: CliRunner, app_with_mock: Typer, mock_storage: MockStorage
     ) -> None:
         """Test that 'ls' alias works."""
         mock_storage.items["item1"] = "Content"
@@ -116,7 +120,7 @@ class TestDeleteCommand:
     """Tests for the delete command."""
 
     def test_delete_item(
-        self, cli_runner: CliRunner, app_with_mock, mock_storage
+        self, cli_runner: CliRunner, app_with_mock: Typer, mock_storage: MockStorage
     ) -> None:
         """Test deleting an item."""
         mock_storage.items["to-delete"] = "Content"
@@ -128,7 +132,7 @@ class TestDeleteCommand:
         assert "to-delete" not in mock_storage.items
 
     def test_delete_alias(
-        self, cli_runner: CliRunner, app_with_mock, mock_storage
+        self, cli_runner: CliRunner, app_with_mock: Typer, mock_storage: MockStorage
     ) -> None:
         """Test that 'rm' alias works."""
         mock_storage.items["item"] = "Content"
@@ -139,7 +143,7 @@ class TestDeleteCommand:
         assert "Deleted" in result.output and "item" in result.output
 
     def test_delete_nonexistent_fails(
-        self, cli_runner: CliRunner, app_with_mock
+        self, cli_runner: CliRunner, app_with_mock: Typer
     ) -> None:
         """Test that deleting nonexistent item fails."""
         result = cli_runner.invoke(app_with_mock, ["delete", "nonexistent"])

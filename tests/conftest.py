@@ -1,8 +1,10 @@
 """Shared pytest fixtures for typ-tmpl."""
 
 import pytest
+from typer import Typer
 from typer.testing import CliRunner
 
+from dev.mocks.storage import MockStorage
 from typ_tmpl.main import app
 
 
@@ -13,21 +15,19 @@ def cli_runner() -> CliRunner:
 
 
 @pytest.fixture()
-def typer_app():
+def typer_app() -> Typer:
     """Return the Typer application under test."""
     return app
 
 
 @pytest.fixture()
-def mock_storage():
+def mock_storage() -> MockStorage:
     """Provide a mock storage for testing."""
-    from dev.mocks.storage import MockStorage
-
     return MockStorage()
 
 
 @pytest.fixture()
-def app_with_mock(mock_storage):
+def app_with_mock(mock_storage: MockStorage) -> Typer:
     """Return app with mock storage injected via callback override."""
     import typer
 
