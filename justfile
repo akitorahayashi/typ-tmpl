@@ -2,10 +2,6 @@
 # justfile for typ-tmpl automation
 # ==============================================================================
 
-set dotenv-load
-
-APP_NAME := env("TYP_TMPL_APP_NAME", "typ-tmpl")
-
 # default target
 default: help
 
@@ -23,14 +19,6 @@ help:
 setup:
     @echo "🐍 Installing python dependencies with uv..."
     @uv sync
-    @echo "Creating environment file..."
-    @if [ ! -f .env ] && [ -f .env.example ]; then \
-        echo "Creating .env from .env.example..."; \
-        cp .env.example .env; \
-        echo "✅ Environment file created (.env)"; \
-    else \
-        echo ".env already exists or .env.example not found. Skipping creation."; \
-    fi
 
 # ==============================================================================
 # Development Commands
@@ -85,15 +73,9 @@ intg-test:
 # CLEANUP
 # ==============================================================================
 
-# Remove __pycache__ and .venv to make project lightweight
+# Remove cache files
 clean:
-    @echo "🧹 Cleaning up project..."
+    @echo "Cleaning up..."
     @find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
-    @rm -rf .venv
-    @rm -rf .pytest_cache
-    @rm -rf .ruff_cache
-    @rm -rf .aider.tags.cache.v4
-    @rm -rf .serena/cache
-    @rm -rf .uv-cache
-    @rm -rf .tmp
-    @echo "✅ Cleanup completed"
+    @rm -rf .venv .pytest_cache .ruff_cache .mypy_cache
+    @echo "Done"

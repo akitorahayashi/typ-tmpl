@@ -1,1 +1,5 @@
-"""Mocks used during local development."""
+"""Mock implementations for testing."""
+
+from dev.mocks.storage import MockStorage
+
+__all__ = ["MockStorage"]
